@@ -78,31 +78,41 @@
               <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                   <tr>
-                    <th>Item</th>
-                    <th>Brand / Model</th>
-                    <th>Bulk Lot</th>
-                    <th>Category</th>
-                    <th></th>
+                    <th class="fw-bold">Item</th>
+                    <th class="fw-bold">Brand / Model</th>
+                    <th class="fw-bold">Bulk Lot</th>
+                    <th class="fw-bold">Category</th>
+                    <th class="fw-bold"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for item in items %}
                     <tr>
                       <td>
-                        <div class="fw-semibold">{{ item.discovered_name|default:"Item "|add:item.id }}</div>
+                        <div class="fw-semibold mb-2">{{ item.discovered_name|default:"Item "|add:item.id }}</div>
                         <div class="text-muted small">{{ item.serial_no|default:'No serial' }}</div>
                       </td>
-                      <td>
-                        {{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}
-                      </td>
+                          <td>
+                            {% if item.brand and item.model %}
+                              {{ item.brand }} / {{ item.model }}
+                            {% elif item.brand %}
+                              {{ item.brand }}
+                            {% elif item.model %}
+                              {{ item.model }}
+                            {% else %}
+                              Unknown
+                            {% endif %}
+                          </td>
                       <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
                       <td>{{ item.bulk_lot.category.name }}</td>
-                      <td class="text-end text-nowrap">
-                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
-                        <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#repairModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Repair</button>
-                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#disposeModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Dispose</button>
-                        <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#holdModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Hold</button>
-                      </td>
+                          <td class="text-end text-nowrap">
+                            <div class="d-flex gap-2 justify-content-end">
+                              <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
+                              <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#repairModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Repair</button>
+                              <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#disposeModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Dispose</button>
+                              <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#holdModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Hold</button>
+                            </div>
+                          </td>
                     </tr>
                   {% empty %}
                     <tr>
@@ -117,37 +127,45 @@
         <div class="row g-3 mt-4 inspection-section-top">
           <div class="col-12 inspection-section-block">
             <div class="card border-0 shadow-sm">
-              <div class="card-header border-0 rounded-0 text-white inspection-section-header">
+              <div class="card-header border-0 rounded-0 text-white inspection-section-header" style="background-color:#f59e0b;">
                 <h3 class="h6 mb-0">For Repair</h3>
               </div>
               <div class="card-body p-0">
                 <div class="table-responsive">
                   <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
-                      <tr>
-                        <th>Item Name</th>
-                        <th>Brand / Model</th>
-                        <th>Bulk Lot</th>
-                        <th>Category</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                      </tr>
+                        <tr>
+                        	<th>Item Name</th>
+                        	<th>Brand / Model</th>
+                        	<th>Bulk Lot</th>
+                        	<th>Category</th>
+                        	<th></th>
+                        </tr>
                     </thead>
                     <tbody>
                       {% for item in repair_items %}
                         <tr>
                           <td>{{ item.discovered_name|default:'Unnamed item' }}</td>
-                          <td>{{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}</td>
+                          <td>
+                            {% if item.brand and item.model %}
+                              {{ item.brand }} / {{ item.model }}
+                            {% elif item.brand %}
+                              {{ item.brand }}
+                            {% elif item.model %}
+                              {{ item.model }}
+                            {% else %}
+                              Unknown
+                            {% endif %}
+                          </td>
                           <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
                           <td>{{ item.bulk_lot.category.name }}</td>
-                          <td><span class="badge text-bg-warning">For Repair</span></td>
                           <td class="text-end text-nowrap">
                             <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
                           </td>
                         </tr>
                       {% empty %}
                         <tr>
-                          <td colspan="6" class="text-center text-muted py-4">No items currently marked for repair.</td>
+                          <td colspan="5" class="text-center text-muted py-4">No items currently marked for repair.</td>
                         </tr>
                       {% endfor %}
                     </tbody>
@@ -159,7 +177,7 @@
 
           <div class="col-12 inspection-section-block">
             <div class="card border-0 shadow-sm">
-              <div class="card-header border-0 rounded-0 text-white inspection-section-header">
+              <div class="card-header border-0 rounded-0 text-white inspection-section-header" style="background-color:#1e293b;">
                 <h3 class="h6 mb-0">On Hold</h3>
               </div>
               <div class="card-body p-0">
@@ -171,25 +189,33 @@
                         <th>Brand / Model</th>
                         <th>Bulk Lot</th>
                         <th>Category</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for item in hold_items %}
                         <tr>
                           <td>{{ item.discovered_name|default:'Unnamed item' }}</td>
-                          <td>{{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}</td>
+                          <td>
+                            {% if item.brand and item.model %}
+                              {{ item.brand }} / {{ item.model }}
+                            {% elif item.brand %}
+                              {{ item.brand }}
+                            {% elif item.model %}
+                              {{ item.model }}
+                            {% else %}
+                              Unknown
+                            {% endif %}
+                          </td>
                           <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
                           <td>{{ item.bulk_lot.category.name }}</td>
-                          <td><span class="badge text-bg-secondary">On Hold</span></td>
                           <td class="text-end text-nowrap">
                             <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
                           </td>
                         </tr>
                       {% empty %}
                         <tr>
-                          <td colspan="6" class="text-center text-muted py-4">No items currently on hold.</td>
+                          <td colspan="5" class="text-center text-muted py-4">No items currently on hold.</td>
                         </tr>
                       {% endfor %}
                     </tbody>
@@ -201,7 +227,7 @@
 
           <div class="col-12 inspection-section-block">
             <div class="card border-0 shadow-sm">
-              <div class="card-header border-0 rounded-0 text-white inspection-section-header">
+              <div class="card-header border-0 rounded-0 text-white inspection-section-header" style="background-color:#ef4444;">
                 <h3 class="h6 mb-0">Disposed</h3>
               </div>
               <div class="card-body p-0">
@@ -213,17 +239,27 @@
                         <th>Brand / Model</th>
                         <th>Bulk Lot</th>
                         <th>Category</th>
-                        <th>Status</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for item in disposed_items %}
                         <tr>
                           <td>{{ item.discovered_name|default:'Unnamed item' }}</td>
-                          <td>{{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}</td>
+                          <td>
+                            {% if item.brand and item.model %}
+                              {{ item.brand }} / {{ item.model }}
+                            {% elif item.brand %}
+                              {{ item.brand }}
+                            {% elif item.model %}
+                              {{ item.model }}
+                            {% else %}
+                              Unknown
+                            {% endif %}
+                          </td>
                           <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
                           <td>{{ item.bulk_lot.category.name }}</td>
-                          <td><span class="badge text-bg-danger">Disposed</span></td>
+                          <td class="text-end text-nowrap"></td>
                         </tr>
                       {% empty %}
                         <tr>

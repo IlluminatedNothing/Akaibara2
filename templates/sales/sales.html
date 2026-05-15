@@ -35,7 +35,7 @@
           <button class="btn btn-light mobile-nav-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas"><i class="bi bi-list"></i></button>
           <h2 class="page-title mb-0">Sales History</h2>
         </div>
-        <a href="{% url 'sales_pos' %}" class="btn btn-sm btn-accent"><i class="bi bi-plus-lg me-1"></i>Cashier</a>
+      
       </header>
 
       <div class="content-wrap flex-grow-1">
@@ -43,57 +43,56 @@
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="table table-hover align-middle mb-0">
+<colgroup>
+    <col style="width: 10%">  <!-- Receipt -->
+    <col style="width: 15%">  <!-- Date -->
+    <col style="width: 18%">  <!-- Cashier -->
+    <col style="width: 8%">   <!-- Items -->
+    <col style="width: 14%">  <!-- Total -->
+    <col style="width: 13%">  <!-- Status -->
+    <col style="width: 22%">  <!-- Actions -->
+</colgroup>
                 <thead class="table-light">
                   <tr>
-                    <th>Receipt</th>
-                    <th>Date</th>
-                    <th>Cashier</th>
-                    <th class="text-end">Total</th>
-                    <th>Status</th>
-                    <th></th>
+                    <th class="fw-bold">Receipt</th>
+                    <th class="fw-bold">Date</th>
+                    <th class="fw-bold">Cashier</th>
+                    <th class="fw-bold text-center">Items</th>
+                    <th class="fw-bold text-end">Total</th>
+                    <th class="fw-bold">Status</th>
+                    <th class="fw-bold"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0301</td>
-                    <td>2025-03-01</td>
-                    <td>C. Mendoza</td>
-                    <td class="text-end">₱6,350.00</td>
-                    <td><span class="badge text-bg-success">Completed</span></td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-2025-0301">View</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0215</td>
-                    <td>2025-02-15</td>
-                    <td>J. Dela Cruz</td>
-                    <td class="text-end">₱350.00</td>
-                    <td><span class="badge text-bg-secondary">Cancelled</span></td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-2025-0215">View</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0210</td>
-                    <td>2025-02-10</td>
-                    <td>C. Mendoza</td>
-                    <td class="text-end">₱1,200.00</td>
-                    <td><span class="badge text-bg-success">Completed</span></td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-2025-0210">View</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0205</td>
-                    <td>2025-02-05</td>
-                    <td>J. Dela Cruz</td>
-                    <td class="text-end">₱800.00</td>
-                    <td><span class="badge text-bg-success">Completed</span></td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-2025-0205">View</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0201</td>
-                    <td>2025-02-01</td>
-                    <td>J. Dela Cruz</td>
-                    <td class="text-end">₱9,000.00</td>
-                    <td><span class="badge text-bg-success">Completed</span></td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-2025-0201">View</button></td>
-                  </tr>
+                  {% for sale in sales %}
+                    <tr>
+                      <td class="font-monospace fw-bold">RC-{{ sale.id }}</td>
+                      <td class="fw-bold">{{ sale.sale_date|date:'M d, Y H:i' }}</td>
+                     <td class="fw-bold">
+    {% if sale.user %}
+        {{ sale.user.get_full_name|default:sale.user.username }}
+    {% else %}
+        Unknown
+    {% endif %}
+</td>
+<td class="text-center fw-bold">{{ sale.item_count }}</td>
+<td class="text-end fw-bold">₱{{ sale.total_amount|floatformat:2 }}</td>
+                      <td class="fw-bold">
+                        {% if sale.status == 'completed' %}
+                          <span class="badge text-bg-success">Completed</span>
+                        {% elif sale.status == 'pending' %}
+                          <span class="badge text-bg-warning">Pending</span>
+                        {% else %}
+                          <span class="badge text-bg-secondary">Cancelled</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-{{ sale.id }}">View</button></td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="6" class="text-center text-muted py-4">No sales records yet.</td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>

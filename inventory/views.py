@@ -88,7 +88,26 @@ def bulk_lots(request):
         item_count=Count('items'),
         pending_count=Count('items', filter=Q(items__status=BulkLotItem.STATUS_PENDING)),
         inspection_count=Count('items', filter=Q(items__status=BulkLotItem.STATUS_FOR_INSPECTION)),
+        approved_count=Count('items', filter=Q(items__status=BulkLotItem.STATUS_APPROVED_FOR_SALE)),
+        repair_count=Count('items', filter=Q(items__status=BulkLotItem.STATUS_FOR_REPAIR)),
+        disposed_count=Count('items', filter=Q(items__status=BulkLotItem.STATUS_DISPOSED)),
+        hold_count=Count('items', filter=Q(items__status=BulkLotItem.STATUS_HOLD)),
     ).order_by('-acquired_at', '-id')
+
+    for lot in lots:
+        processed_count = lot.approved_count + lot.repair_count + lot.disposed_count + lot.hold_count
+        if lot.item_count > 0 and lot.pending_count == lot.item_count:
+            lot.status_text = 'Pending'
+            lot.status_badge = 'secondary'
+        elif lot.inspection_count > 0 and processed_count == 0 and lot.pending_count == 0:
+            lot.status_text = 'Released for Inspection'
+            lot.status_badge = 'primary'
+        elif lot.item_count > 0 and lot.pending_count == 0 and lot.inspection_count == 0 and processed_count == lot.item_count:
+            lot.status_text = 'Fully Processed'
+            lot.status_badge = 'success'
+        else:
+            lot.status_text = 'In Progress'
+            lot.status_badge = 'warning'
 
     context = {
         'create_form': create_form,

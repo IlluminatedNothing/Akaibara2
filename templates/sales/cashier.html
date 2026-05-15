@@ -39,71 +39,33 @@
       </header>
 
       <div class="content-wrap flex-grow-1">
+        {% if messages %}
+          <div class="mb-3">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
         <div class="row g-3">
           <div class="col-lg-7">
             <div class="input-group mb-3">
               <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-              <input type="search" class="form-control" placeholder="Search products…" aria-label="Search products">
+              <input id="productSearch" type="search" class="form-control" placeholder="Search products…" aria-label="Search products">
             </div>
             <div class="card border-0 shadow-sm">
               <div class="card-header bg-white py-3 fw-semibold border-bottom">Products</div>
-              <div class="list-group list-group-flush">
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="Fujitsu Lifebook A574" data-price="3500">
-                  <span>
-                    <span class="d-block fw-medium">Fujitsu Lifebook A574</span>
-                    <small class="text-secondary">PRD-ID-001 · ₱3,500</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="NEC VersaPro VK26" data-price="5500">
-                  <span>
-                    <span class="d-block fw-medium">NEC VersaPro VK26</span>
-                    <small class="text-secondary">PRD-ID-002 · ₱5,500</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="Panasonic CF-D1" data-price="7000">
-                  <span>
-                    <span class="d-block fw-medium">Panasonic CF-D1</span>
-                    <small class="text-secondary">PRD-ID-003 · ₱7,000</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="Noritake Glass Set" data-price="450">
-                  <span>
-                    <span class="d-block fw-medium">Noritake Glass Set</span>
-                    <small class="text-secondary">PRD-ID-004 · ₱450</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="Iwaki Heat Resistant Bowl" data-price="350">
-                  <span>
-                    <span class="d-block fw-medium">Iwaki Heat Resistant Bowl</span>
-                    <small class="text-secondary">PRD-ID-005 · ₱350</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="Nishikawa Pillow" data-price="600">
-                  <span>
-                    <span class="d-block fw-medium">Nishikawa Pillow</span>
-                    <small class="text-secondary">PRD-ID-006 · ₱600</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="Senshu Bedsheet Set" data-price="850">
-                  <span>
-                    <span class="d-block fw-medium">Senshu Bedsheet Set</span>
-                    <small class="text-secondary">PRD-ID-007 · ₱850</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-name="Assorted Stationery Bundle" data-price="200">
-                  <span>
-                    <span class="d-block fw-medium">Assorted Stationery Bundle</span>
-                    <small class="text-secondary">PRD-ID-008 · ₱200</small>
-                  </span>
-                  <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
-                </button>
+              <div class="list-group list-group-flush" id="productList">
+                {% for product in products %}
+                  <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 add-line" data-id="{{ product.id }}" data-name="{{ product.name|escapejs }}" data-price="{{ product.price }}" data-stock="{{ product.current_stock }}">
+                    <span>
+                      <span class="d-block fw-semibold">{{ product.name }}</span>
+                      <small class="text-secondary">{{ product.category.name }} · ₱{{ product.price|floatformat:2 }}</small>
+                    </span>
+                    <span class="btn btn-sm btn-accent"><i class="bi bi-plus-lg"></i></span>
+                  </button>
+                {% empty %}
+                  <div class="list-group-item py-4 text-center text-secondary">No products available with stock.</div>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -115,24 +77,29 @@
               <div class="pos-cart-body p-3" id="cartLines">
                 <p class="text-secondary small mb-0" id="cartEmpty">Tap a product to add a line.</p>
               </div>
-              <div class="p-3 border-top mt-auto bg-white">
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="text-secondary">Subtotal</span>
-                  <span id="subtotalDisplay">₱0</span>
+              <form id="checkoutForm" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="checkout">
+                <input type="hidden" name="cart_data" id="cartDataInput" value="[]">
+                <div class="p-3 border-top mt-auto bg-white">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-secondary">Subtotal</span>
+                    <span id="subtotalDisplay">₱0.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-3">
+                    <span class="text-secondary">Tax (8%)</span>
+                    <span id="taxDisplay">₱0.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                    <span>Total</span>
+                    <span id="totalDisplay">₱0.00</span>
+                  </div>
+                  <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-accent btn-lg" id="checkoutBtn" data-bs-toggle="modal" data-bs-target="#checkoutModal" disabled>Charge / Checkout</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="clearCartBtn">Clear cart</button>
+                  </div>
                 </div>
-                <div class="d-flex justify-content-between mb-3">
-                  <span class="text-secondary">Tax (12% est.)</span>
-                  <span id="taxDisplay">₱0</span>
-                </div>
-                <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
-                  <span>Total</span>
-                  <span id="totalDisplay">₱0</span>
-                </div>
-                <div class="d-grid gap-2">
-                  <button type="button" class="btn btn-accent btn-lg" id="checkoutBtn" data-bs-toggle="modal" data-bs-target="#checkoutModal" disabled>Charge / Checkout</button>
-                  <button type="button" class="btn btn-outline-secondary btn-sm" id="clearCartBtn">Clear cart</button>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -173,7 +140,8 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <a href="{% url 'sales_home' %}" class="btn btn-accent">View sales history</a>
+          <button type="button" class="btn btn-accent" id="confirmCheckoutBtn">Confirm payment</button>
+          <a href="{% url 'sales_home' %}" class="btn btn-outline-secondary">View sales history</a>
         </div>
       </div>
     </div>
@@ -182,49 +150,162 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     (function () {
-      var subtotal = 0;
+      var cart = {};
       var cartEl = document.getElementById('cartLines');
       var emptyEl = document.getElementById('cartEmpty');
       var checkoutBtn = document.getElementById('checkoutBtn');
+      var checkoutTotal = document.getElementById('checkoutTotal');
+      var cartDataInput = document.getElementById('cartDataInput');
+      var checkoutForm = document.getElementById('checkoutForm');
+      var confirmCheckoutBtn = document.getElementById('confirmCheckoutBtn');
+      var searchInput = document.getElementById('productSearch');
+      var productCards = Array.from(document.querySelectorAll('.add-line'));
 
-      function formatPeso(n) {
-        return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      function formatPeso(value) {
+        return '₱' + Number(value).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function getSubtotal() {
+        return Object.values(cart).reduce(function (sum, item) {
+          return sum + item.price * item.quantity;
+        }, 0);
       }
 
       function renderTotals() {
-        var tax = Math.round(subtotal * 0.12);
-        var total = subtotal + tax;
+        var subtotal = getSubtotal();
+        var tax = Number((subtotal * 0.08).toFixed(2));
+        var total = Number((subtotal + tax).toFixed(2));
         document.getElementById('subtotalDisplay').textContent = formatPeso(subtotal);
         document.getElementById('taxDisplay').textContent = formatPeso(tax);
         document.getElementById('totalDisplay').textContent = formatPeso(total);
-        document.getElementById('checkoutTotal').textContent = formatPeso(total);
+        checkoutTotal.textContent = formatPeso(total);
         checkoutBtn.disabled = subtotal === 0;
+        cartDataInput.value = JSON.stringify(Object.values(cart).map(function (item) {
+          return {
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+          };
+        }));
       }
 
-      document.querySelectorAll('.add-line').forEach(function (btn) {
+      function renderCart() {
+        var items = Object.values(cart);
+        cartEl.innerHTML = '';
+
+        if (!items.length) {
+          cartEl.innerHTML = '<p class="text-secondary small mb-0" id="cartEmpty">Tap a product to add a line.</p>';
+          emptyEl = document.getElementById('cartEmpty');
+          renderTotals();
+          return;
+        }
+
+        items.forEach(function (item) {
+          var lineTotal = Number((item.price * item.quantity).toFixed(2));
+          var row = document.createElement('div');
+          row.className = 'pos-line d-flex justify-content-between align-items-start mb-3';
+          row.setAttribute('data-product-id', item.id);
+          row.innerHTML =
+            '<div class="me-3">' +
+              '<div class="fw-semibold mb-1">' + item.name + '</div>' +
+              '<div class="d-flex align-items-center gap-1">' +
+                '<button type="button" class="btn btn-sm btn-outline-secondary qty-decrease">-</button>' +
+                '<span class="fw-semibold qty-value">' + item.quantity + '</span>' +
+                '<button type="button" class="btn btn-sm btn-outline-secondary qty-increase">+</button>' +
+                '<button type="button" class="btn btn-sm btn-link text-danger remove-item">Remove</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="text-end">' +
+              '<div class="font-monospace">' + formatPeso(lineTotal) + '</div>' +
+            '</div>';
+
+          cartEl.appendChild(row);
+        });
+
+        document.querySelectorAll('.qty-decrease').forEach(function (button) {
+          button.addEventListener('click', function () {
+            var row = button.closest('[data-product-id]');
+            var id = row.getAttribute('data-product-id');
+            updateCartQuantity(id, -1);
+          });
+        });
+
+        document.querySelectorAll('.qty-increase').forEach(function (button) {
+          button.addEventListener('click', function () {
+            var row = button.closest('[data-product-id]');
+            var id = row.getAttribute('data-product-id');
+            updateCartQuantity(id, 1);
+          });
+        });
+
+        document.querySelectorAll('.remove-item').forEach(function (button) {
+          button.addEventListener('click', function () {
+            var row = button.closest('[data-product-id]');
+            var id = row.getAttribute('data-product-id');
+            delete cart[id];
+            renderCart();
+          });
+        });
+
+        renderTotals();
+      }
+
+      function updateCartQuantity(id, delta) {
+        if (!cart[id]) {
+          return;
+        }
+        cart[id].quantity += delta;
+        if (cart[id].quantity < 1) {
+          delete cart[id];
+        }
+        renderCart();
+      }
+
+      function addToCart(product) {
+        if (!cart[product.id]) {
+          cart[product.id] = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: 0,
+          };
+        }
+        cart[product.id].quantity += 1;
+        renderCart();
+      }
+
+      productCards.forEach(function (btn) {
         btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-id');
           var name = btn.getAttribute('data-name');
           var price = parseFloat(btn.getAttribute('data-price'));
-          subtotal += price;
-          if (emptyEl) {
-            emptyEl.remove();
-            emptyEl = null;
+          var stock = parseInt(btn.getAttribute('data-stock'), 10);
+
+          if (stock === 0) {
+            return;
           }
-          var row = document.createElement('div');
-          row.className = 'pos-line d-flex justify-content-between align-items-start';
-          row.innerHTML = '<span>' + name + '</span><span class="font-monospace">' + formatPeso(price) + '</span>';
-          cartEl.appendChild(row);
-          renderTotals();
+
+          addToCart({ id: id, name: name, price: price });
         });
       });
 
-      document.getElementById('clearCartBtn').addEventListener('click', function () {
-        subtotal = 0;
-        cartEl.innerHTML = '<p class="text-secondary small mb-0" id="cartEmpty">Tap a product to add a line.</p>';
-        emptyEl = document.getElementById('cartEmpty');
-        renderTotals();
+      searchInput.addEventListener('input', function () {
+        var query = searchInput.value.trim().toLowerCase();
+        productCards.forEach(function (card) {
+          var name = card.getAttribute('data-name').toLowerCase();
+          card.style.display = name.indexOf(query) !== -1 ? '' : 'none';
+        });
       });
 
+      confirmCheckoutBtn.addEventListener('click', function () {
+        if (Object.keys(cart).length === 0) {
+          return;
+        }
+        checkoutForm.submit();
+      });
+
+      renderCart();
       renderTotals();
     })();
   </script>

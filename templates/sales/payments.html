@@ -41,58 +41,52 @@
         <div class="card border-0 shadow-sm table-card">
           <div class="card-body p-0">
             <div class="table-responsive">
-              <table class="table table-hover align-middle mb-0">
+              <table class="table table-hover align-middle mb-0" style="table-layout: fixed;">
+                <colgroup>
+                  <col style="width: 10%">
+                  <col style="width: 15%">
+                  <col style="width: 18%">
+                  <col style="width: 15%">
+                  <col style="width: 17%">
+                  <col style="width: 25%">
+                </colgroup>
                 <thead class="table-light">
                   <tr>
-                    <th>Payment ID</th>
-                    <th>Date</th>
-                    <th>Method</th>
-                    <th>Reference</th>
-                    <th class="text-end">Amount</th>
-                    <th></th>
+                    <th class="fw-bold">Payment ID</th>
+                    <th class="fw-bold">Date</th>
+                    <th class="fw-bold">Method</th>
+                    <th class="fw-bold">Reference</th>
+                    <th class="fw-bold text-end">Amount</th>
+                    <th class="fw-bold"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td class="font-monospace">PAY-2025-0005</td>
-                    <td>2025-03-01</td>
-                    <td><span class="badge text-bg-dark">Card</span></td>
-                    <td class="small text-secondary">Sale RC-2025-0301</td>
-                    <td class="text-end fw-medium">₱6,350.00</td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-2025-0005" data-amt="6350">Details</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">PAY-2025-0004</td>
-                    <td>2025-02-10</td>
-                    <td><span class="badge text-bg-primary">GCash</span></td>
-                    <td class="small text-secondary">Sale RC-2025-0210</td>
-                    <td class="text-end fw-medium">₱500.00</td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-2025-0004" data-amt="500">Details</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">PAY-2025-0003</td>
-                    <td>2025-02-10</td>
-                    <td><span class="badge text-bg-success">Cash</span></td>
-                    <td class="small text-secondary">Sale RC-2025-0210</td>
-                    <td class="text-end fw-medium">₱700.00</td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-2025-0003" data-amt="700">Details</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">PAY-2025-0002</td>
-                    <td>2025-02-05</td>
-                    <td><span class="badge text-bg-primary">GCash</span></td>
-                    <td class="small text-secondary">Sale RC-2025-0205</td>
-                    <td class="text-end fw-medium">₱800.00</td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-2025-0002" data-amt="800">Details</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">PAY-2025-0001</td>
-                    <td>2025-02-01</td>
-                    <td><span class="badge text-bg-success">Cash</span></td>
-                    <td class="small text-secondary">Sale RC-2025-0201</td>
-                    <td class="text-end fw-medium">₱9,000.00</td>
-                    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-2025-0001" data-amt="9000">Details</button></td>
-                  </tr>
+                  {% for payment in payments %}
+                    <tr>
+                      <td class="font-monospace fw-bold">PAY-{{ payment.id }}</td>
+                      <td class="fw-bold">{{ payment.paid_at|date:'M d, Y H:i' }}</td>
+                      <td class="fw-bold">
+                        {% if payment.payment_method == 'cash' %}
+                          <span class="badge text-bg-success">Cash</span>
+                        {% elif payment.payment_method == 'gcash' %}
+                          <span class="badge text-bg-primary">GCash</span>
+                        {% elif payment.payment_method == 'card' %}
+                          <span class="badge" style="background-color:#6f42c1;color:#fff">Card</span>
+                        {% elif payment.payment_method == 'bank_transfer' %}
+                          <span class="badge text-bg-warning">Bank Transfer</span>
+                        {% else %}
+                          <span class="badge text-bg-secondary">Mixed</span>
+                        {% endif %}
+                      </td>
+                      <td class="fw-bold">Sale RC-{{ payment.sale.id }}</td>
+                      <td class="text-end fw-bold">₱{{ payment.amount|floatformat:2 }}</td>
+                      <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-{{ payment.id }}" data-amt="{{ payment.amount }}">Details</button></td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="6" class="text-center text-muted py-4">No payment records yet.</td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>

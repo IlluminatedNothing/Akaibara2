@@ -77,6 +77,15 @@
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="table table-hover align-middle mb-0">
+                <colgroup>
+                  <col style="width: 8%">
+                  <col style="width: 25%">
+                  <col style="width: 15%">
+                  <col style="width: 10%">
+                  <col style="width: 8%">
+                  <col style="width: 15%">
+                  <col style="width: 19%">
+                </colgroup>
                 <thead class="table-light">
                   <tr>
                     <th>Lot ID</th>
@@ -97,13 +106,7 @@
                       <td class="text-end">{{ lot.item_count }}</td>
                       <td></td>
                       <td>
-                        {% if lot.pending_count > 0 %}
-                          <span class="badge text-bg-warning">Pending</span>
-                        {% elif lot.inspection_count > 0 %}
-                          <span class="badge text-bg-info">For inspection</span>
-                        {% else %}
-                          <span class="badge text-bg-success">Released</span>
-                        {% endif %}
+                        <span class="badge text-bg-{{ lot.status_badge }}">{{ lot.status_text }}</span>
                       </td>
                       <td class="text-end">
                         <div class="d-flex justify-content-end gap-2">
