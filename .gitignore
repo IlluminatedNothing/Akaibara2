@@ -1,0 +1,36 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Env
+venv/
+env/
+ENV/
+
+# Django
+db.sqlite3
+media/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+

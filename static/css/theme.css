@@ -1,0 +1,82 @@
+/* Japanese Surplus Theme - Khaki/Green Minimalist */
+
+/* Colors */
+
+:root {
+  --khaki: #C3B091;
+  --olive: #808000;
+  --dark-green: #556B2F;
+  --light-bg: #F5F5DC;
+  --text-dark: #2F4F2F;
+}
+:root {
+  --khaki: #C3B091;
+  --olive: #808000;
+  --dark-green: #556B2F;
+  --light-bg: #F5F5DC;
+  --text-dark: #2F4F2F;
+}
+
+/* Global */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light-bg);
+  color: var(--text-dark);
+}
+
+.navbar {
+  background-color: var(--dark-green) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+.btn-success {
+  background-color: var(--olive);
+  border-color: var(--olive);
+}
+
+.btn-success:hover {
+  background-color: var(--dark-green);
+  border-color: var(--dark-green);
+}
+
+.card {
+  border: 1px solid var(--khaki);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.table {
+  background-color: white;
+}
+
+/* Dashboard Charts */
+.chart-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Japanese touch */
+h1, h2 {
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar-nav {
+    text-align: center;
+  }
+}
+
+:root {
+  --khaki: #C3B091;
+  --olive: #808000;
+  --dark-green: #556B2F;
+  --light-bg: #F5F5DC;
+  --text-dark: #2F4F2F;
+}
+

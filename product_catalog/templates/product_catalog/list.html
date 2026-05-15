@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Product Catalog{% endblock %}
+
+{% block content %}
+<div class="row" id="products-grid">
+    {% for product in products %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                <p class="fw-bold">${{ product.price }}</p>
+                <button class="btn btn-success" onclick="addToCart({{ product.id }})">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>No products available.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+

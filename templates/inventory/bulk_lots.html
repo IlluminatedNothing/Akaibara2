@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulk Lots — Akaibara Japanese Surplus</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body>
+  <div class="d-flex min-vh-100">
+    <aside class="app-sidebar d-none d-lg-flex flex-column">
+      <div class="app-brand">
+        <h1>Akaibara Japanese Surplus</h1>
+        <small>Inventory management &amp; POS system</small>
+      </div>
+      <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
+        <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a class="nav-link active" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
+        <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+        <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
+        <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
+        <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
+        <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
+        <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
+        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+      </nav>
+    </aside>
+
+    <div class="app-main flex-grow-1 d-flex flex-column">
+      <header class="top-toolbar d-flex align-items-center justify-content-between gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-light mobile-nav-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas"><i class="bi bi-list"></i></button>
+          <h2 class="page-title mb-0">Bulk Lots</h2>
+        </div>
+        <button type="button" class="btn btn-sm btn-accent" data-bs-toggle="modal" data-bs-target="#createLotModal">New Bulk Lot</button>
+      </header>
+
+      <div class="content-wrap flex-grow-1">
+        <p class="text-secondary mb-3">Inbound bulk lots from suppliers and auctions.</p>
+        {% if messages %}
+          <div class="mb-3">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm table-card mb-4">
+          <div class="card-body p-3">
+            <div class="row g-3">
+              <div class="col-lg-4">
+                <div class="border rounded-3 p-3 h-100 bg-light">
+                  <h6>Total lots</h6>
+                  <p class="display-6 mb-0">{{ lots|length }}</p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="border rounded-3 p-3 h-100 bg-light">
+                  <h6>Pending items</h6>
+                  <p class="display-6 mb-0">{{ pending_sorting_count }}</p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="border rounded-3 p-3 h-100 bg-light">
+                  <h6>Items for inspection</h6>
+                  <p class="display-6 mb-0">{{ for_inspection_count }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm table-card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Lot ID</th>
+                    <th>Source</th>
+                    <th>Received</th>
+                    <th class="text-end">Est. Units</th>
+                    <th></th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for lot in lots %}
+                    <tr>
+                      <td class="font-monospace fw-medium">BL-{{ lot.id }}</td>
+                      <td>{{ lot.source_note|default:'No source provided' }}</td>
+                      <td>{{ lot.acquired_at|date:'Y-m-d' }}</td>
+                      <td class="text-end">{{ lot.item_count }}</td>
+                      <td></td>
+                      <td>
+                        {% if lot.pending_count > 0 %}
+                          <span class="badge text-bg-warning">Pending</span>
+                        {% elif lot.inspection_count > 0 %}
+                          <span class="badge text-bg-info">For inspection</span>
+                        {% else %}
+                          <span class="badge text-bg-success">Released</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                          <a href="{% url 'inventory_item_inspection' %}" class="btn btn-sm btn-outline-primary">View Inspection</a>
+                          <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="release_lot">
+                            <input type="hidden" name="lot_id" value="{{ lot.id }}">
+                            <button type="submit" class="btn btn-sm btn-warning" {% if lot.pending_count == 0 %}disabled{% endif %}>Release</button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="7" class="text-center text-muted py-4">No bulk lots available yet.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="sidebarOffcanvas">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Akaibara Japanese Surplus</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <nav class="nav flex-column sidebar-nav py-2">
+        <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a class="nav-link active" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
+        <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+        <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
+        <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
+        <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
+        <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
+        <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
+        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="modal fade" id="createLotModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_bulk_lot">
+          <div class="modal-header">
+            <h5 class="modal-title">Create New Bulk Lot</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              {{ create_form.source_note.label_tag }}
+              {{ create_form.source_note }}
+              {{ create_form.source_note.errors }}
+            </div>
+            <div class="mb-3">
+              <label for="id_category" class="form-label">Category</label>
+              <select name="category" class="form-select" id="id_category" required>
+                <option value="">Select a category</option>
+                {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6 mb-3">
+                {{ create_form.acquired_at.label_tag }}
+                {{ create_form.acquired_at }}
+                {{ create_form.acquired_at.errors }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="id_total_cost" class="form-label">Total Cost</label>
+                <div class="input-group">
+                  <span class="input-group-text">₱</span>
+                  {{ create_form.total_cost }}
+                </div>
+                {{ create_form.total_cost.errors }}
+              </div>
+            </div>
+            <div class="mb-3">
+              {{ create_form.remarks.label_tag }}
+              {{ create_form.remarks }}
+              {{ create_form.remarks.errors }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-accent">Create Bulk Lot</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

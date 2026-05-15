@@ -1,0 +1,13 @@
+Django==5.1.1
+psycopg2-binary==2.9.9
+Pillow==11.1.0
+django-crispy-forms==2.3
+crispy-bootstrap5==2024.10
+django-filter==24.3
+djangorestframework
+
+#> venv312\Scripts\activate
+#> pip install -r requirements.txt
+#> python -m venv venv
+#>  .\venv\Scripts\Activate.ps1      
+#> python manage.py runserver

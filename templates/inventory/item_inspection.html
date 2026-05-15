@@ -1,0 +1,518 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Item Inspection — Akaibara Japanese Surplus</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body>
+  <div class="d-flex min-vh-100">
+    <aside class="app-sidebar d-none d-lg-flex flex-column">
+      <div class="app-brand">
+        <h1>Akaibara Japanese Surplus</h1>
+        <small>Inventory management &amp; POS system</small>
+      </div>
+      <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
+        <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a class="nav-link" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
+        <a class="nav-link active" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+        <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
+        <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
+        <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
+        <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
+        <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
+        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+      </nav>
+    </aside>
+
+    <div class="app-main flex-grow-1 d-flex flex-column">
+      <header class="top-toolbar d-flex align-items-center justify-content-between gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-light mobile-nav-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas"><i class="bi bi-list"></i></button>
+          <h2 class="page-title mb-0">Item Inspection</h2>
+        </div>
+      </header>
+
+      <div class="content-wrap flex-grow-1">
+        <p class="text-secondary mb-3">Queue of bulk lot items awaiting a decision.</p>
+        {% if messages %}
+          <div class="mb-3">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm table-card mb-4">
+          <div class="card-body p-3">
+            <div class="row g-3">
+              <div class="col-lg-4">
+                <div class="border rounded-3 p-3 h-100 bg-light">
+                  <h6>Items in inspection</h6>
+                  <p class="display-6 mb-0">{{ pending_inspection_count }}</p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="border rounded-3 p-3 h-100 bg-light">
+                  <h6>Approved for sale</h6>
+                  <p class="display-6 mb-0">{{ approved_count }}</p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="border rounded-3 p-3 h-100 bg-light">
+                  <h6>Pending actions</h6>
+                  <p class="display-6 mb-0">{{ items|length }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm table-card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Item</th>
+                    <th>Brand / Model</th>
+                    <th>Bulk Lot</th>
+                    <th>Category</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in items %}
+                    <tr>
+                      <td>
+                        <div class="fw-semibold">{{ item.discovered_name|default:"Item "|add:item.id }}</div>
+                        <div class="text-muted small">{{ item.serial_no|default:'No serial' }}</div>
+                      </td>
+                      <td>
+                        {{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}
+                      </td>
+                      <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
+                      <td>{{ item.bulk_lot.category.name }}</td>
+                      <td class="text-end text-nowrap">
+                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
+                        <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#repairModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Repair</button>
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#disposeModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Dispose</button>
+                        <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#holdModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Hold</button>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="5" class="text-center text-muted py-4">No items are currently waiting for inspection.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row g-3 mt-4 inspection-section-top">
+          <div class="col-12 inspection-section-block">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header border-0 rounded-0 text-white inspection-section-header">
+                <h3 class="h6 mb-0">For Repair</h3>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Item Name</th>
+                        <th>Brand / Model</th>
+                        <th>Bulk Lot</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in repair_items %}
+                        <tr>
+                          <td>{{ item.discovered_name|default:'Unnamed item' }}</td>
+                          <td>{{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}</td>
+                          <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
+                          <td>{{ item.bulk_lot.category.name }}</td>
+                          <td><span class="badge text-bg-warning">For Repair</span></td>
+                          <td class="text-end text-nowrap">
+                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
+                          </td>
+                        </tr>
+                      {% empty %}
+                        <tr>
+                          <td colspan="6" class="text-center text-muted py-4">No items currently marked for repair.</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 inspection-section-block">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header border-0 rounded-0 text-white inspection-section-header">
+                <h3 class="h6 mb-0">On Hold</h3>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Item Name</th>
+                        <th>Brand / Model</th>
+                        <th>Bulk Lot</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in hold_items %}
+                        <tr>
+                          <td>{{ item.discovered_name|default:'Unnamed item' }}</td>
+                          <td>{{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}</td>
+                          <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
+                          <td>{{ item.bulk_lot.category.name }}</td>
+                          <td><span class="badge text-bg-secondary">On Hold</span></td>
+                          <td class="text-end text-nowrap">
+                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
+                          </td>
+                        </tr>
+                      {% empty %}
+                        <tr>
+                          <td colspan="6" class="text-center text-muted py-4">No items currently on hold.</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 inspection-section-block">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header border-0 rounded-0 text-white inspection-section-header">
+                <h3 class="h6 mb-0">Disposed</h3>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Item Name</th>
+                        <th>Brand / Model</th>
+                        <th>Bulk Lot</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in disposed_items %}
+                        <tr>
+                          <td>{{ item.discovered_name|default:'Unnamed item' }}</td>
+                          <td>{{ item.brand|default:'Unknown' }} / {{ item.model|default:'Unknown' }}</td>
+                          <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
+                          <td>{{ item.bulk_lot.category.name }}</td>
+                          <td><span class="badge text-bg-danger">Disposed</span></td>
+                        </tr>
+                      {% empty %}
+                        <tr>
+                          <td colspan="5" class="text-center text-muted py-4">No disposed items yet.</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="sidebarOffcanvas">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Akaibara Japanese Surplus</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <nav class="nav flex-column sidebar-nav py-2">
+        <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a class="nav-link" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
+        <a class="nav-link active" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+        <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
+        <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
+        <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
+        <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
+        <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
+        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="modal fade" id="approveModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="approve">
+          {{ approve_form.item_id }}
+          <div class="modal-header">
+            <h5 class="modal-title">Approve Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="small text-muted mb-3">Use this form to approve the selected item, create a product, and add stock.</p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                {{ approve_form.discovered_name.label_tag }}
+                {{ approve_form.discovered_name }}
+                {{ approve_form.discovered_name.errors }}
+              </div>
+              <div class="col-md-6">
+                {{ approve_form.condition_grade.label_tag }}
+                {{ approve_form.condition_grade }}
+                {{ approve_form.condition_grade.errors }}
+              </div>
+            </div>
+            <div class="row g-3 mt-3">
+              <div class="col-md-4">
+                {{ approve_form.brand.label_tag }}
+                {{ approve_form.brand }}
+                {{ approve_form.brand.errors }}
+              </div>
+              <div class="col-md-4">
+                {{ approve_form.model.label_tag }}
+                {{ approve_form.model }}
+                {{ approve_form.model.errors }}
+              </div>
+              <div class="col-md-4">
+                {{ approve_form.serial_no.label_tag }}
+                {{ approve_form.serial_no }}
+                {{ approve_form.serial_no.errors }}
+              </div>
+            </div>
+            <hr>
+            <div class="mb-3">
+              {{ approve_form.product_name.label_tag }}
+              {{ approve_form.product_name }}
+              {{ approve_form.product_name.errors }}
+            </div>
+            <div class="mb-3">
+              {{ approve_form.description.label_tag }}
+              {{ approve_form.description }}
+              {{ approve_form.description.errors }}
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="id_price" class="form-label">Price</label>
+                <div class="input-group">
+                  <span class="input-group-text">₱</span>
+                  {{ approve_form.price }}
+                </div>
+                {{ approve_form.price.errors }}
+              </div>
+              <div class="col-md-6">
+                {{ approve_form.stock_location.label_tag }}
+                {{ approve_form.stock_location }}
+                {{ approve_form.stock_location.errors }}
+              </div>
+            </div>
+            <div class="mb-3 mt-3">
+              {{ approve_form.specs.label_tag }}
+              {{ approve_form.specs }}
+              {{ approve_form.specs.errors }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Approve and List</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="repairModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="repair">
+          {{ repair_form.item_id }}
+          <div class="modal-header">
+            <h5 class="modal-title">Send Item to Repair</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Item</label>
+              <div id="repairItemLabel" class="fw-semibold"></div>
+            </div>
+            <div class="mb-3">
+              <label for="repairDiscoveredName" class="form-label">Item Name</label>
+              <input type="text" id="repairDiscoveredName" name="discovered_name" class="form-control" value="" />
+            </div>
+            <div class="mb-3">
+              {{ repair_form.condition_grade.label_tag }}
+              {{ repair_form.condition_grade }}
+              {{ repair_form.condition_grade.errors }}
+            </div>
+            <div class="mb-3">
+              {{ repair_form.notes.label_tag }}
+              {{ repair_form.notes }}
+              {{ repair_form.notes.errors }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-warning">Send to Repair</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="disposeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="dispose">
+          {{ dispose_form.item_id }}
+          <div class="modal-header">
+            <h5 class="modal-title">Dispose Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Item</label>
+              <div id="disposeItemLabel" class="fw-semibold"></div>
+            </div>
+            <div class="mb-3">
+              <label for="disposeDiscoveredName" class="form-label">Item Name</label>
+              <input type="text" id="disposeDiscoveredName" name="discovered_name" class="form-control" value="" />
+            </div>
+            <div class="mb-3">
+              {{ dispose_form.condition_grade.label_tag }}
+              {{ dispose_form.condition_grade }}
+              {{ dispose_form.condition_grade.errors }}
+            </div>
+            <div class="mb-3">
+              {{ dispose_form.disposal_reason.label_tag }}
+              {{ dispose_form.disposal_reason }}
+              {{ dispose_form.disposal_reason.errors }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Dispose Item</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="holdModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="hold">
+          <input type="hidden" name="item_id" value="">
+          <div class="modal-header">
+            <h5 class="modal-title">Hold Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Item</label>
+              <div id="holdItemLabel" class="fw-semibold"></div>
+            </div>
+            <div class="mb-3">
+              <label for="holdDiscoveredName" class="form-label">Item Name</label>
+              <input type="text" id="holdDiscoveredName" name="discovered_name" class="form-control" value="" />
+            </div>
+            <div class="mb-3">
+              <p class="text-muted small">Hold this item for future review instead of approving, repairing, or disposing it.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-dark">Hold Item</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var approveModal = document.getElementById('approveModal');
+      var repairModal = document.getElementById('repairModal');
+      var disposeModal = document.getElementById('disposeModal');
+      var holdModal = document.getElementById('holdModal');
+
+      var modalSetup = function (modal, labelSelector, nameSelector) {
+        modal.addEventListener('show.bs.modal', function (event) {
+          var button = event.relatedTarget;
+          var itemId = button.getAttribute('data-item-id');
+          var itemLabel = button.getAttribute('data-item-label');
+          var hiddenInput = modal.querySelector('input[name="item_id"]');
+          if (labelSelector) {
+            var itemLabelElement = modal.querySelector(labelSelector);
+            if (itemLabelElement) {
+              itemLabelElement.textContent = itemLabel;
+            }
+          }
+          if (hiddenInput) {
+            hiddenInput.value = itemId;
+          }
+          if (nameSelector) {
+            var nameInput = modal.querySelector(nameSelector);
+            if (nameInput) {
+              nameInput.value = itemLabel;
+            }
+          }
+        });
+      };
+
+      if (approveModal) {
+        modalSetup(approveModal, null, 'input[name="discovered_name"]');
+      }
+      if (repairModal) {
+        modalSetup(repairModal, '#repairItemLabel', '#repairDiscoveredName');
+      }
+      if (disposeModal) {
+        modalSetup(disposeModal, '#disposeItemLabel', '#disposeDiscoveredName');
+      }
+      if (holdModal) {
+        modalSetup(holdModal, '#holdItemLabel', '#holdDiscoveredName');
+      }
+
+      var decimalInputs = document.querySelectorAll('.decimal-input');
+      decimalInputs.forEach(function (input) {
+        input.addEventListener('input', function () {
+          var value = this.value;
+          if (value.indexOf('.') >= 0) {
+            this.value = value.replace(/^(\d+\.\d{0,2}).*$/, '$1');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
