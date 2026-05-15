@@ -14,7 +14,7 @@
     <aside class="app-sidebar d-none d-lg-flex flex-column">
       <div class="app-brand">
         <h1>Akaibara Japanese Surplus</h1>
-        <small>Inventory management &amp; POS system</small>
+<small>Japanese Surplus Point of Sale Tracker System</small>
       </div>
       <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
@@ -86,7 +86,7 @@
                           <span class="badge text-bg-secondary">Cancelled</span>
                         {% endif %}
                       </td>
-                      <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-{{ sale.id }}">View</button></td>
+<td class="text-end"><button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#saleDetailModal" data-rc="RC-{{ sale.id }}">View</button></td>
                     </tr>
                   {% empty %}
                     <tr>

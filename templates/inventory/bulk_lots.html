@@ -14,7 +14,7 @@
     <aside class="app-sidebar d-none d-lg-flex flex-column">
       <div class="app-brand">
         <h1>Akaibara Japanese Surplus</h1>
-        <small>Inventory management &amp; POS system</small>
+<small>Japanese Surplus Point of Sale Tracker System</small>
       </div>
       <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
@@ -26,6 +26,7 @@
         <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
         <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
         <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+        <a class="nav-link" href="{% url 'auth_logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
       </nav>
     </aside>
 
@@ -39,7 +40,7 @@
       </header>
 
       <div class="content-wrap flex-grow-1">
-        <p class="text-secondary mb-3">Inbound bulk lots from suppliers and auctions.</p>
+        
         {% if messages %}
           <div class="mb-3">
             {% for message in messages %}
@@ -150,6 +151,7 @@
         <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
         <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
         <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+        <a class="nav-link" href="{% url 'auth_logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
       </nav>
     </div>
   </div>

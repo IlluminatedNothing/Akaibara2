@@ -226,6 +226,34 @@ body {
   border-bottom: 2px solid #5eead4 !important;
 }
 
+/* POS: Order summary box header */
+.pos-cart .order-summary-header {
+  background-color: #0f766e !important;
+  color: #ffffff !important;
+  padding: 0.75rem 1rem;
+  border-bottom: 0 !important;
+}
+
+.pos-cart .order-summary-header * {
+  color: #ffffff !important;
+}
+
+/* Align POS columns top */
+@media (min-width: 992px) {
+  .sales-pos-layout {
+    align-items: flex-start;
+  }
+
+  .sales-pos-layout > .row {
+    align-items: flex-start;
+  }
+}
+
+
+
+
+
+
 .inspection-section-header h3,
 .inspection-section-header h4,
 .inspection-section-header * {

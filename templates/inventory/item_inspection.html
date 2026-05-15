@@ -14,7 +14,7 @@
     <aside class="app-sidebar d-none d-lg-flex flex-column">
       <div class="app-brand">
         <h1>Akaibara Japanese Surplus</h1>
-        <small>Inventory management &amp; POS system</small>
+<small>Japanese Surplus Point of Sale Tracker System</small>
       </div>
       <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
@@ -25,7 +25,10 @@
         <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
         <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
         <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
-        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+
+          <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+      
+        <a class="nav-link" href="{% url 'auth_logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
       </nav>
     </aside>
 
@@ -38,7 +41,6 @@
       </header>
 
       <div class="content-wrap flex-grow-1">
-        <p class="text-secondary mb-3">Queue of bulk lot items awaiting a decision.</p>
         {% if messages %}
           <div class="mb-3">
             {% for message in messages %}
@@ -92,27 +94,27 @@
                         <div class="fw-semibold mb-2">{{ item.discovered_name|default:"Item "|add:item.id }}</div>
                         <div class="text-muted small">{{ item.serial_no|default:'No serial' }}</div>
                       </td>
-                          <td>
-                            {% if item.brand and item.model %}
-                              {{ item.brand }} / {{ item.model }}
-                            {% elif item.brand %}
-                              {{ item.brand }}
-                            {% elif item.model %}
-                              {{ item.model }}
-                            {% else %}
-                              Unknown
-                            {% endif %}
-                          </td>
+                      <td>
+                        {% if item.brand and item.model %}
+                          {{ item.brand }} / {{ item.model }}
+                        {% elif item.brand %}
+                          {{ item.brand }}
+                        {% elif item.model %}
+                          {{ item.model }}
+                        {% else %}
+                          Unknown
+                        {% endif %}
+                      </td>
                       <td class="font-monospace">BL-{{ item.bulk_lot.id }}</td>
                       <td>{{ item.bulk_lot.category.name }}</td>
-                          <td class="text-end text-nowrap">
-                            <div class="d-flex gap-2 justify-content-end">
-                              <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
-                              <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#repairModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Repair</button>
-                              <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#disposeModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Dispose</button>
-                              <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#holdModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Hold</button>
-                            </div>
-                          </td>
+                      <td class="text-end text-nowrap">
+                        <div class="d-flex gap-2 justify-content-end">
+                          <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Approve</button>
+                          <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#repairModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Repair</button>
+                          <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#disposeModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Dispose</button>
+                          <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#holdModal" data-item-id="{{ item.id }}" data-item-label="{{ item.discovered_name|default:'Item ' }}{{ item.id }}">Hold</button>
+                        </div>
+                      </td>
                     </tr>
                   {% empty %}
                     <tr>
@@ -124,6 +126,7 @@
             </div>
           </div>
         </div>
+
         <div class="row g-3 mt-4 inspection-section-top">
           <div class="col-12 inspection-section-block">
             <div class="card border-0 shadow-sm">
@@ -134,13 +137,13 @@
                 <div class="table-responsive">
                   <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
-                        <tr>
-                        	<th>Item Name</th>
-                        	<th>Brand / Model</th>
-                        	<th>Bulk Lot</th>
-                        	<th>Category</th>
-                        	<th></th>
-                        </tr>
+                      <tr>
+                        <th>Item Name</th>
+                        <th>Brand / Model</th>
+                        <th>Bulk Lot</th>
+                        <th>Category</th>
+                        <th></th>
+                      </tr>
                     </thead>
                     <tbody>
                       {% for item in repair_items %}
@@ -292,11 +295,15 @@
         <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
         <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
         <a class="nav-link" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
-        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+        {% if user.is_superuser or user.profile.role == 'admin' %}
+          <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+        {% endif %}
+        <a class="nav-link" href="{% url 'auth_logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
       </nav>
     </div>
   </div>
 
+  <!-- MODALS (unchanged content follows) -->
   <div class="modal fade" id="approveModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered">
       <div class="modal-content">
@@ -520,11 +527,6 @@
             var nameInput = modal.querySelector(nameSelector);
             if (nameInput) {
               nameInput.value = itemLabel;
-            }
-          }
-        });
-      };
-
       if (approveModal) {
         modalSetup(approveModal, null, 'input[name="discovered_name"]');
       }

@@ -15,7 +15,7 @@
     <aside class="app-sidebar d-none d-lg-flex flex-column">
       <div class="app-brand">
         <h1>Akaibara Japanese Surplus</h1>
-        <small>Inventory management &amp; POS system</small>
+<small>Japanese Surplus Point of Sale Tracker System</small>
       </div>
       <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
         <a class="nav-link active" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
@@ -50,8 +50,9 @@
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
                     <p class="text-secondary small mb-1">Total Sales (completed)</p>
-                    <h3 class="mb-0 fw-bold">₱17,350</h3>
-                    <span class="badge bg-success-subtle text-success mt-2">Feb–Mar 2025</span>
+                    <h3 class="mb-0 fw-bold">₱{{ total_sales_amount|floatformat:2 }}</h3>
+                    <span class="badge bg-success-subtle text-success mt-2">All time</span>
+
                   </div>
                   <div class="stat-icon bg-success-subtle text-success">₱</div>
                 </div>
@@ -64,7 +65,8 @@
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
                     <p class="text-secondary small mb-1">Low Stock Alerts</p>
-                    <h3 class="mb-0 fw-bold">2 items</h3>
+                    <h3 class="mb-0 fw-bold">{{ low_stock_count }} items</h3>
+
                     <button type="button" class="btn btn-link btn-sm p-0 mt-1" data-bs-toggle="modal" data-bs-target="#lowStockModal">View list</button>
                   </div>
                   <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-exclamation-triangle"></i></div>
@@ -88,10 +90,10 @@
           </div>
         </div>
 
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm mt-4 bg-white" style="background-color:#ffffff;">
           <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
             <span class="fw-semibold">Recent Transactions</span>
-            <a href="{% url 'sales_home' %}" class="btn btn-sm btn-outline-secondary">View all</a>
+            <a href="{% url 'sales_home' %}" class="btn btn-sm btn-outline-primary text-white">View all</a>
           </div>
           <div class="card-body p-0">
             <div class="table-responsive">
@@ -106,35 +108,21 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0301</td>
-                    <td>09:30</td>
-                    <td>3</td>
-                    <td class="text-end">₱6,350.00</td>
-                    <td><span class="badge text-bg-success">Completed</span></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0215</td>
-                    <td>15:00</td>
-                    <td>1</td>
-                    <td class="text-end">₱350.00</td>
-                    <td><span class="badge text-bg-secondary">Cancelled</span></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0210</td>
-                    <td>11:00</td>
-                    <td>2</td>
-                    <td class="text-end">₱1,200.00</td>
-                    <td><span class="badge text-bg-success">Completed</span></td>
-                  </tr>
-                  <tr>
-                    <td class="font-monospace">RC-2025-0205</td>
-                    <td>14:00</td>
-                    <td>2</td>
-                    <td class="text-end">₱800.00</td>
-                    <td><span class="badge text-bg-success">Completed</span></td>
-                  </tr>
+                  {% for t in recent_transactions %}
+                    <tr>
+                      <td class="font-monospace">{{ t.receipt }}</td>
+                      <td>{{ t.time }}</td>
+                      <td>{{ t.items_count }}</td>
+                      <td class="text-end">₱{{ t.total|floatformat:2 }}</td>
+                      <td><span class="badge {{ t.status_badge_class }}">{{ t.status_badge }}</span></td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="5" class="text-center text-secondary py-4">No sales yet.</td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
+
               </table>
             </div>
           </div>
@@ -175,10 +163,19 @@
         </div>
         <div class="modal-body">
           <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between">NEC VersaPro VK26 <span class="badge bg-warning text-dark">2 at reorder</span></li>
-            <li class="list-group-item d-flex justify-content-between">Panasonic CF-D1 <span class="badge bg-warning text-dark">1 at reorder</span></li>
+            {% if low_stock_items %}
+              {% for item in low_stock_items %}
+                <li class="list-group-item d-flex justify-content-between">
+                  {{ item.product_name }}
+                  <span class="badge bg-warning text-dark">{{ item.quantity }} at reorder</span>
+                </li>
+              {% endfor %}
+            {% else %}
+              <li class="list-group-item text-secondary">No low-stock items.</li>
+            {% endif %}
           </ul>
           <p class="text-secondary small mt-3 mb-0">Products at or below reorder level.</p>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -14,18 +14,23 @@
     <aside class="app-sidebar d-none d-lg-flex flex-column">
       <div class="app-brand">
         <h1>Akaibara Japanese Surplus</h1>
-        <small>Inventory management &amp; POS system</small>
+<small>Japanese Surplus Point of Sale Tracker System</small>
       </div>
       <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a class="nav-link" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
-        <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+    
+          <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+
         <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
         <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
         <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
         <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
         <a class="nav-link active" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
-        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+    
+          <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+      
+        <a class="nav-link" href="{% url 'auth_logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
       </nav>
     </aside>
 
@@ -80,7 +85,7 @@
                       </td>
                       <td class="fw-bold">Sale RC-{{ payment.sale.id }}</td>
                       <td class="text-end fw-bold">₱{{ payment.amount|floatformat:2 }}</td>
-                      <td class="text-end"><button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-{{ payment.id }}" data-amt="{{ payment.amount }}">Details</button></td>
+                      <td class="text-end"><button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#payModal" data-id="PAY-{{ payment.id }}" data-amt="{{ payment.amount }}">Details</button></td>
                     </tr>
                   {% empty %}
                     <tr>
@@ -105,31 +110,33 @@
       <nav class="nav flex-column sidebar-nav py-2">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a class="nav-link" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
-        <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+      
+          <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
+     
         <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
         <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
         <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
         <a class="nav-link" href="{% url 'sales_pos' %}"><i class="bi bi-cart-plus"></i> Cashier</a>
         <a class="nav-link active" href="{% url 'sales_payments' %}"><i class="bi bi-credit-card"></i> Payments</a>
-        <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+    
+          <a class="nav-link" href="{% url 'auth_users_list' %}"><i class="bi bi-people"></i> User Management</a>
+     
       </nav>
     </div>
   </div>
 
-  <div class="modal fade" id="payModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Payment <span id="payModalId"></span></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p class="mb-1">Amount: <strong id="payModalAmt"></strong></p>
-          <p class="text-secondary small mb-0">Receipt details.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Payment <span id="payModalId"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-1">Amount: <strong id="payModalAmt"></strong></p>
+        <p class="text-secondary small mb-0">Receipt details.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
