@@ -19,9 +19,9 @@
       <nav class="sidebar-nav nav flex-column flex-grow-1 py-2">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a class="nav-link" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
-        {% if user.is_superuser or (user.profile and user.profile.role == 'inspector') or (user.profile and user.profile.role == 'admin') %}
+      
           <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
-        {% endif %}
+      
         <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
         <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
         <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
@@ -110,9 +110,9 @@
       <nav class="nav flex-column sidebar-nav py-2">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a class="nav-link" href="{% url 'inventory_bulk_lots' %}"><i class="bi bi-box-seam"></i> Bulk Lots</a>
-        {% if user.is_superuser or (user.profile and user.profile.role == 'inspector') or (user.profile and user.profile.role == 'admin') %}
+
           <a class="nav-link" href="{% url 'inventory_item_inspection' %}"><i class="bi bi-clipboard-check"></i> Item Inspection</a>
-        {% endif %}
+
         <a class="nav-link" href="{% url 'catalog_list' %}"><i class="bi bi-grid"></i> Products</a>
         <a class="nav-link" href="{% url 'inventory_home' %}"><i class="bi bi-archive"></i> Inventory</a>
         <a class="nav-link" href="{% url 'sales_home' %}"><i class="bi bi-receipt"></i> Sales</a>
